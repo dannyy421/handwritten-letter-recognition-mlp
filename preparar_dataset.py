@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import random
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
 
 
 def binarizar(carpeta_origen,carpeta_destino):
@@ -187,30 +188,91 @@ def codificacion_etiquetas(direccion_y):
                                         # y solamente un 1 al que le corresponde esa categoria
     return (y_one_hot)
 
+def division_datos_train_y_test(X_preparado, y_preparado):
+    X = np.load(X_preparado)
+    y = np.load(y_preparado)
+
+    print(f"Dataset original: {X.shape[0]} muestras.")
+
+    # estratificacion
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=0.2,  # 20 a pruebas y 80 restante a entrenamiento
+        random_state=1, # sincroniza la alatoriedad
+        stratify=y  # proporcion de letras igual tanto en entrenamiento como en prueba
+    )
+
+    np.save("X_train.npy", X_train)
+    np.save("y_train.npy", y_train)
+
+    np.save("X_test", X_test)
+    np.save("y_test", y_test)
+
+    print(f"Conjunto de Entrenamiento (80%): {X_train.shape[0]} muestras")
+    print(f"Conjunto de Prueba        (20%): {X_test.shape[0]} muestras")
+    print(f"Total de muestras validadas:     {X_train.shape[0] + X_test.shape[0]}")
+
+def validar_datos_train_y_test(y_train, y_test):
+    y_train = np.load(y_train, allow_pickle=True)
+    y_test = np.load(y_test, allow_pickle=True)
+    # se regresan a numeros de 0 a 25 porque estaban en one hot
+    if len(y_train.shape) > 1:
+        y_train_labels = np.argmax(y_train, axis=1)
+        y_test_labels = np.argmax(y_test, axis=1)
+    else:
+        y_train_labels = y_train
+        y_test_labels = y_test
+
+    # Abecedario para mostrar las letras en lugar de números
+    abc = [chr(i) for i in range(ord('A'), ord('Z')+1)]
+
+    # Contar frecuencia de cada letra
+    clases_train, conteos_train = np.unique(y_train_labels, return_counts=True)
+    clases_test, conteos_test = np.unique(y_test_labels, return_counts=True)
+
+    print(f"{'Letra':<6} | {'Cant. Entrenamiento (80%)':<25} | {'Cant. Prueba (20%)':<20}")
+    print("-" * 60)
+    for i in range(26):
+        letra = abc[i]
+        c_train = conteos_train[i] if i in clases_train else 0
+        c_test = conteos_test[i] if i in clases_test else 0
+        print(f"  {letra:<4} | {c_train:<25} | {c_test:<20}")
+
+    print("-" * 60)
+    print(f"TOTAL  | {len(y_train_labels):<25} | {len(y_test_labels):<20}")
 
 # BINARIZAR CARPETAS FALTANTES
-origen = "Dataset_Robotica_A\Dataset_alumno01"   
-destino = "Dataset_Robotica_A\Dataset_alumno40_bin" 
+origen = "Dataset_alumno01"   
+destino = "Dataset_alumno40_bin" 
 #binarizar(origen,destino)
 
 # MUESTRA DE ALGUN DATASET
-X = "Dataset_Robotica_A\Dataset_alumno40/X.npy"
-y = "Dataset_Robotica_A\Dataset_alumno40/y.npy"
+X = "X.npy"
+y = "y.npy"
 #muestra_npy(X,y)
 
 # GENERAR DATASET GRUPAL
-directorio = "Dataset_Robotica_A"
-nombre_salida = "grupo"
+directorio = "."
+nombre_salida = "grupoBorrar"
 #generar_dataset_grupal(directorio,nombre_salida)
 
 # APLANADO
-X_preparado = flatten_normalizado("Dataset_Robotica_A\X_grupo.npy")
+#X_preparado = flatten_normalizado("Dataset_Robotica_A\X_grupo.npy")
 
 # ETIQUETAS CONVERTIDAS
-y_preparado = codificacion_etiquetas("Dataset_Robotica_A\y_grupo.npy")
-np.save("Dataset_Robotica_A\X_preparado.npy", X_preparado)
-np.save("Dataset_Robotica_A\y_preparado.npy", y_preparado)
+#y_preparado = codificacion_etiquetas("Dataset_Robotica_A\y_grupo.npy")
+#np.save("Dataset_Robotica_A\X_preparado.npy", X_preparado)
+#np.save("Dataset_Robotica_A\y_preparado.npy", y_preparado)
 
+# DIVIDIR DATOS DE ENTRENAMIENTO Y PRUEBA
+X_preparado = "X_preparado.npy"
+y_preparado = "y_preparado.npy"
+division_datos_train_y_test(X_preparado,y_preparado)
+
+# VERIFICAR DATOS DE ENTRENAMIENTO Y PRUEBA
+y_train = "y_train.npy"
+y_test = "y_test.npy"
+#validar_datos_train_y_test(y_train, y_test)
 
 
 
