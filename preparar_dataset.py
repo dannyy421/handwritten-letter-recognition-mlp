@@ -202,11 +202,11 @@ def division_datos_train_y_test(X_preparado, y_preparado):
         stratify=y  # proporcion de letras igual tanto en entrenamiento como en prueba
     )
 
-    np.save("X_train.npy", X_train)
-    np.save("y_train.npy", y_train)
+    np.save("Archivos_X_y\X_train.npy", X_train)
+    np.save("Archivos_X_y\y_train.npy", y_train)
 
-    np.save("X_test", X_test)
-    np.save("y_test", y_test)
+    np.save("Archivos_X_y\X_test", X_test)
+    np.save("Archivos_X_y\y_test", y_test)
 
     print(f"Conjunto de Entrenamiento (80%): {X_train.shape[0]} muestras")
     print(f"Conjunto de Prueba        (20%): {X_test.shape[0]} muestras")
@@ -247,32 +247,32 @@ destino = "DATASET\Dataset_alumno40_bin"
 #binarizar(origen,destino)
 
 # MUESTRA DE ALGUN DATASET
-X = "X.npy"
-y = "y.npy"
+X = "Archivos_X_y\X_grupo.npy"
+y = "Archivos_X_y\y_grupo.npy"
 #muestra_npy(X,y)
 
 # GENERAR DATASET GRUPAL
 directorio = "DATASET"
-nombre_salida = "grupoBorrar"
+nombre_salida = "grupo"
 #generar_dataset_grupal(directorio,nombre_salida)
 
 # APLANADO
-#X_preparado = flatten_normalizado("Dataset_Robotica_A\X_grupo.npy")
+#X_preparado = flatten_normalizado("Archivos_X_y\X_grupo.npy")
 
 # ETIQUETAS CONVERTIDAS
-#y_preparado = codificacion_etiquetas("Dataset_Robotica_A\y_grupo.npy")
-#np.save("Dataset_Robotica_A\X_preparado.npy", X_preparado)
-#np.save("Dataset_Robotica_A\y_preparado.npy", y_preparado)
+#y_preparado = codificacion_etiquetas("Archivos_X_y\y_grupo.npy")
+#np.save("Archivos_X_y\X_preparado.npy", X_preparado)
+#np.save("Archivos_X_y\y_preparado.npy", y_preparado)
 
 # DIVIDIR DATOS DE ENTRENAMIENTO Y PRUEBA
-X_preparado = "X_preparado.npy"
-y_preparado = "y_preparado.npy"
-division_datos_train_y_test(X_preparado,y_preparado)
+X_preparado = "Archivos_X_y\X_preparado.npy"
+y_preparado = "Archivos_X_y\y_preparado.npy"
+#division_datos_train_y_test(X_preparado,y_preparado)
 
 # VERIFICAR DATOS DE ENTRENAMIENTO Y PRUEBA
-y_train = "y_train.npy"
-y_test = "y_test.npy"
-#validar_datos_train_y_test(y_train, y_test)
+y_train = "Archivos_X_y\y_train.npy"
+y_test = "Archivos_X_y\y_test.npy"
+validar_datos_train_y_test(y_train, y_test)
 
 
 
