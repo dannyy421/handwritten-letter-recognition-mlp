@@ -242,8 +242,8 @@ def validar_datos_train_y_test(y_train, y_test):
     print(f"TOTAL  | {len(y_train_labels):<25} | {len(y_test_labels):<20}")
 
 # BINARIZAR CARPETAS FALTANTES
-origen = "Dataset_alumno01"   
-destino = "Dataset_alumno40_bin" 
+origen = "DATASET\Dataset_alumno01"   
+destino = "DATASET\Dataset_alumno40_bin" 
 #binarizar(origen,destino)
 
 # MUESTRA DE ALGUN DATASET
@@ -252,7 +252,7 @@ y = "y.npy"
 #muestra_npy(X,y)
 
 # GENERAR DATASET GRUPAL
-directorio = "."
+directorio = "DATASET"
 nombre_salida = "grupoBorrar"
 #generar_dataset_grupal(directorio,nombre_salida)
 
