@@ -60,6 +60,6 @@ for i, indice in enumerate(indices_aleatorios):
               color=color_titulo, fontsize=9)
     plt.axis('off')
 
-plt.suptitle("Inferencias Aleatorias sobre X_test usando Modelo Cargado (.keras)")
+plt.suptitle("Inferencias aleatorias sobre X_test usando modelo cargado (.keras)")
 plt.tight_layout()
 plt.show()

@@ -70,8 +70,8 @@ class interfaz:
 
 
             # Filtro para evitar falsos positivos
-            #if probabilidad > 0.75:
-                #return self.abc[clase_ganadora]
+            if probabilidad > 0.85:
+                return self.abc[clase_ganadora]
             return self.abc[clase_ganadora]
         except Exception as e:
             print(f"Error en prediccion {e}")

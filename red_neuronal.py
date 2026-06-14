@@ -141,4 +141,4 @@ plt.show()
 
 # ----------------- GUARDAR MODELO ---------------------------
 modelo.save("modelo_abecedario.keras")
-print("¡Modelo guardado con éxito en el disco duro!")
+print("Modelo guardado")
