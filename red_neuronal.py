@@ -3,6 +3,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -107,12 +108,28 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-# ------------------------- INFERENCIAS Y AUDITORIA VISUAL-------------------------------------
-# pasa imagenes test por red entrenada, devuelce matriz, cada fila representa una img y tiene 26 prob
+# Decodificar de one hot a indices numeticos para metricas
+y_test_numerico = np.argmax(y_test, axis=1) if len(y_test.shape) > 1 else y_test.astype(int)
+
+
+# ------------------------- INFERENCIAS -------------------------------------
+# pasa imagenes test por red entrenada, devuelve matriz, cada fila representa una img y tiene 26 prob
 predicciones = modelo.predict(X_test)
 # busca la que tuvo la probabilidad mas alta y asigna esa etiqueta
 predicciones_clases = np.argmax(predicciones, axis=1)
 
+# MATRIZ DE CONFUSION
+matriz_confusion = confusion_matrix(y_test_numerico, predicciones_clases)
+
+plt.figure(figsize=(12, 10))
+disp = ConfusionMatrixDisplay(confusion_matrix=matriz_confusion, display_labels=abc)
+disp.plot(cmap='Blues', values_format='d', ax=plt.gca())
+plt.title('Matriz de confusion')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# INFERENCIAS AL AZAR
 # 15 indices al azar del conjunto de test
 total_muestras = X_test.shape[0]
 indices_aleatorios = np.random.choice(total_muestras, size=15, replace=False)
@@ -139,6 +156,52 @@ plt.suptitle("Inferencias en conjunto TEST")
 plt.tight_layout()
 plt.show()
 
+# ----------------- FILTRAR PREDICCIONES CORRECTAS E INCORRECTAS ------------------
+# Indices donde acertó y donde se equivocó
+indices_correctos = np.where(predicciones_clases == y_test_numerico)[0]
+indices_errores = np.where(predicciones_clases != y_test_numerico)[0]
+
+# Muestras de 9 indices correctos
+if len(indices_correctos) >= 9:
+    indices_visualizar_ok = np.random.choice(indices_correctos, size=9, replace=False)
+    plt.figure(figsize=(8, 8))
+    for i, indice in enumerate(indices_visualizar_ok):
+        plt.subplot(3, 3, i + 1)
+        imagen = X_test[indice].reshape(50, 50)
+        plt.imshow(imagen, cmap='gray')
+        
+        letra_real = abc[y_test_numerico[indice]]
+        letra_pred = abc[predicciones_clases[indice]]
+        
+        plt.title(f"Real: {letra_real} | Pred: {letra_pred}", color='green', fontsize=10)
+        plt.axis('off')
+    plt.suptitle("Ejemplos PREDICCIONES CORRECTAS", fontsize=14)
+    plt.tight_layout()
+    plt.show()
+
+# Muestras de 9 indices incorrectos
+if len(indices_errores) > 0:
+    # Selecciona hasta 9 errores (o los que existan si son menos)
+    cant_errores_mostrar = min(9, len(indices_errores))
+    indices_visualizar_err = np.random.choice(indices_errores, size=cant_errores_mostrar, replace=False)
+    
+    plt.figure(figsize=(8, 8))
+    for i, indice in enumerate(indices_visualizar_err):
+        plt.subplot(3, 3, i + 1)
+        imagen = X_test[indice].reshape(50, 50)
+        plt.imshow(imagen, cmap='gray')
+        
+        letra_real = abc[y_test_numerico[indice]]
+        letra_pred = abc[predicciones_clases[indice]]
+        
+        plt.title(f"Real: {letra_real} | Pred: {letra_pred}", color='red', fontsize=10)
+        plt.axis('off')
+    plt.suptitle("Ejemplos PREDICCIONES INCORRECTAS", fontsize=14)
+    plt.tight_layout()
+    plt.show()
+else:
+    print("\nEl modelo no cometio errores")
+
 # ----------------- GUARDAR MODELO ---------------------------
-modelo.save("modelo_abecedario.keras")
-print("Modelo guardado")
+#modelo.save("modelo_abecedario.keras")
+#print("Modelo guardado")
