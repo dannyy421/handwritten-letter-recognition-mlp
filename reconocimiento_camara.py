@@ -9,7 +9,7 @@ class interfaz:
     def __init__(self, window):
         self.window = window
         self.window.title("Reconocimiento de letras")
-        self.window.geometry("800x650")
+        self.window.geometry("950x650")
         self.recuadro_centrado = None
 
         # Cargar modelo entrenado
@@ -30,9 +30,22 @@ class interfaz:
                                    font=("Arial", 12, "bold"), fg="orange")
         self.lbl_estado.pack(pady=5)
         
+        self.frame_pantallas = tk.Frame(window)
+        self.frame_pantallas.pack(pady=10)
+
         self.lbl_video = tk.Label(window, bg="black")
         self.lbl_video.pack(pady=10)
-        
+
+        # CONTENEDOR DERECHO: etiqueta y la img procesada
+        self.frame_preproceso = tk.Frame(self.frame_pantallas)
+        self.frame_preproceso.grid(row=0, column=1, padx=10, sticky="n")
+        self.lbl_tit_preproceso = tk.Label(self.frame_preproceso, text="Vista preprocesada", 
+                                           font=("Arial", 10, "bold"), fg="blue")
+        self.lbl_tit_preproceso.pack(pady=2)
+        # imagen preprocesada (binarizada y escalada)
+        self.lbl_video_preproceso = tk.Label(self.frame_preproceso, bg="gray", width=100, height=100)
+        self.lbl_video_preproceso.pack(pady=5)
+
         self.btn_cerrar = tk.Button(window, text="Cerrar", font=("Arial", 12, "bold"), 
                                     bg="#d9534f", fg="white", command=self.cerrar)
         self.btn_cerrar.pack(pady=15)
@@ -49,7 +62,7 @@ class interfaz:
             roi = frame[y1:y2, x1:x2]
 
             if roi.size == 0:
-                return None
+                return None, None
             
             # PREPROCESAR igual que al dataset
             # grises
@@ -68,14 +81,16 @@ class interfaz:
             clase_ganadora = np.argmax(prediccion, axis=1)[0]
             probabilidad = prediccion[0][clase_ganadora]
 
-
-            # Filtro para evitar falsos positivos
+            letra = None
             if probabilidad > 0.85:
-                return self.abc[clase_ganadora]
-            return self.abc[clase_ganadora]
+                letra = self.abc[clase_ganadora]
+                
+            # Retorna tanto la letra detectada como la matriz binarizada para poder dibujarla
+            return letra, thresh_roi
+
         except Exception as e:
             print(f"Error en prediccion {e}")
-        return None
+        return None, None
 
     def actualizar_camara(self):
         ret, frame = self.cap.read()
@@ -100,7 +115,7 @@ class interfaz:
             cv2.rectangle(frame, tuple(self.recuadro_centrado[0]), tuple(self.recuadro_centrado[1]), (0, 255, 255), 2)
 
             # Clasificar la letra dentro 
-            letra_detectada = self.clasificar_letra(frame_procesamiento, self.recuadro_centrado)
+            letra_detectada, img_preprocesada = self.clasificar_letra(frame_procesamiento, self.recuadro_centrado)
 
             # Interfaz visual sobre el video
             if letra_detectada:
@@ -110,12 +125,14 @@ class interfaz:
                 cv2.putText(frame, "Esperando caracter...", (self.recuadro_centrado[0][0], self.recuadro_centrado[0][1]-10), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
-            # Renderizar el cuadro final adaptado a la interfaz de Tkinter
-            cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-            img = Image.fromarray(cv2image)
-            imgtk = ImageTk.PhotoImage(image=img)
-            self.lbl_video.imgtk = imgtk
-            self.lbl_video.configure(image=imgtk)
+            # --- RENDERIZAR LA IMAGEN PREPROCESADA  ---
+            if img_preprocesada is not None:
+                # Escalar a 150x150 para ver en interfaz
+                img_mini_render = cv2.resize(img_preprocesada, (100, 100), interpolation=cv2.INTER_NEAREST)
+                img_pil_pre = Image.fromarray(img_mini_render)
+                imgtk_pre = ImageTk.PhotoImage(image=img_pil_pre)
+                self.lbl_video_preproceso.imgtk = imgtk_pre
+                self.lbl_video_preproceso.configure(image=imgtk_pre)
 
             # Renderizar en Tkinter
             cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
