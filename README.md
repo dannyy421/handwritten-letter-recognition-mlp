@@ -34,7 +34,7 @@ El repositorio se organiza bajo la siguiente arquitectura de archivos y director
   Mediante el archivo `prueba_modelo_abecedario.py`realiza pruebas de el modelo entrenado sobre un conjunto aleatorio de los datos separados para la prueba, donde se escpecifíca su etiqueta real, su etiqueta que predijo el modelo y si acertó o no la predicción.
 
 ## 4. Implementación en tiempo real: 
-  La interfaz de uzuarui con la libreria `Tkinter` e integrada con `ÒpenCV`:
+  La interfaz de usuario con la libreria `Tkinter` e integrada con `ÒpenCV`:
   * Zona de enfoque: al iniciar el programa se detecta la resolución de la camara y calcula un cuadrado centrado de 250x250 pixeles
   * Procesamiento de inferencias: Casa 15 ms se captura una región de interes delimitada, la procesa como se hizo con el dataset (escala de grises, redimension a 50x50 pixeles, binarización inversa con Otsu) y el modelo predice su etiqueta.
   * Visualización de resultado: se implime la clasificación en tiempo real directamente sobre la pantalla
